@@ -1,0 +1,85 @@
+{
+  "generated_at_utc": "2026-10-15T10:42:58.207005+00:00",
+  "cli_version": "codex-cli 0.162.0-alpha.17.2",
+  "method": "Live Codex model decisions and real stdio MCP calls; effects on a separate local SQLite database.",
+  "limitations": [
+    "One model family, one run per case",
+    "Local test backend, not a hosted production service",
+    "Injected tool failures, not real network outages",
+    "No statistical superiority claim"
+  ],
+  "runs": [
+    {
+      "scenario": "normal_success",
+      "strategy": "guarded",
+      "requested_model": "gpt-6-astra",
+      "prompt": "Use only the receipt_lab ticket tools. Create exactly one local test ticket titled 'Investigate invoice parser' for each of these authorized action slots: primary. Each slot is a separate intended action, even if titles match. Report only what the tool evidence confirms, including any unresolved outcome. Do not use shell, files, web, other connectors, or other tools. Keep the final response short.",
+      "agent_messages": [
+        "I\u2019ll create one local test ticket for the primary slot and report the confirmed result.\n",
+        "Verified: one local test ticket created for primary \u2014 \u201cInvestigate invoice parser\u201d (ID 1)."
+      ],
+      "tool_trace": [
+        {
+          "tool": "create_ticket",
+          "arguments": {
+            "slot": "primary",
+            "title": "Investigate invoice parser"
+          },
+          "result": {
+            "scope": "live-ticket-lab",
+            "key": "workflow-1:primary",
+            "tool": "tickets.create:v1",
+            "fingerprint": "cadddf506a24563d18a171b5765b2fc5d8f3e1536249d1b8d20d3344fbaa0a3d",
+            "state": "returned",
+            "result": {
+              "id": 1
+            },
+            "evidence": null,
+            "replayed": false,
+            "next_action": "inspect_result",
+            "may_dispatch_again": false
+          }
+        },
+        {
+          "tool": "inspect_ticket",
+          "arguments": {
+            "slot": "primary",
+            "title": "Investigate invoice parser"
+          },
+          "result": {
+            "scope": "live-ticket-lab",
+            "key": "workflow-1:primary",
+            "tool": "tickets.create:v1",
+            "fingerprint": "cadddf506a24563d18a171b5765b2fc5d8f3e1536249d1b8d20d3344fbaa0a3d",
+            "state": "verified",
+            "result": {
+              "id": 1
+            },
+            "evidence": "effects:1",
+            "replayed": false,
+            "next_action": "inspect_result",
+            "may_dispatch_again": false
+          }
+        }
+      ],
+      "model_usage": [
+        {
+          "input_tokens": 53553,
+          "cached_input_tokens": 39296,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 159,
+          "reasoning_output_tokens": 0
+        }
+      ],
+      "duration_seconds": 14.62,
+      "process_exit_code": 0,
+      "runtime_completed": true,
+      "expected_effects": 1,
+      "observed_effects": 1,
+      "backend_dispatches": 1,
+      "complete_effects_match": true,
+      "receipt_state_check": true,
+      "passed": true
+    }
+  ]
+}

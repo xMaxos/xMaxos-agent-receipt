@@ -1,0 +1,44 @@
+test_arguments_not_persisted_in_journal (test_guard.GuardTests.test_arguments_not_persisted_in_journal) ... ok
+test_async_callback_rejected_before_reservation (test_guard.GuardTests.test_async_callback_rejected_before_reservation) ... ok
+test_bad_callback_does_not_consume_operation (test_guard.GuardTests.test_bad_callback_does_not_consume_operation) ... ok
+test_completed_response_replayed_after_restart (test_guard.GuardTests.test_completed_response_replayed_after_restart) ... ok
+test_concurrent_verification_wins_over_late_tool_response (test_guard.GuardTests.test_concurrent_verification_wins_over_late_tool_response) ... ok
+test_conflicting_arguments_and_tools_are_rejected (test_guard.GuardTests.test_conflicting_arguments_and_tools_are_rejected) ... ok
+test_database_failures_prevent_dispatch (test_guard.GuardTests.test_database_failures_prevent_dispatch) ... ok
+test_database_version_mismatch_is_rejected (test_guard.GuardTests.test_database_version_mismatch_is_rejected) ... ok
+test_dict_order_does_not_change_identity (test_guard.GuardTests.test_dict_order_does_not_change_identity) ... ok
+test_errors_in_verifier_propagate_without_changing_state (test_guard.GuardTests.test_errors_in_verifier_propagate_without_changing_state) ... ok
+test_inconclusive_observation_never_releases_reservation (test_guard.GuardTests.test_inconclusive_observation_never_releases_reservation) ... ok
+test_inconclusive_verifier_reloads_late_completion (test_guard.GuardTests.test_inconclusive_verifier_reloads_late_completion) ... ok
+test_inflight_call_is_not_reissued_after_empty_lookup (test_guard.GuardTests.test_inflight_call_is_not_reissued_after_empty_lookup) ... ok
+test_inputs_are_snapshotted_before_dispatch (test_guard.GuardTests.test_inputs_are_snapshotted_before_dispatch) ... ok
+test_int_float_bool_are_distinct (test_guard.GuardTests.test_int_float_bool_are_distinct) ... ok
+test_invalid_observation_cannot_resolve_unknown (test_guard.GuardTests.test_invalid_observation_cannot_resolve_unknown) ... ok
+test_json_null_return_is_terminal (test_guard.GuardTests.test_json_null_return_is_terminal) ... ok
+test_keyboard_interrupt_and_cancellation_preserve_reservation (test_guard.GuardTests.test_keyboard_interrupt_and_cancellation_preserve_reservation) ... ok
+test_memory_database_rejected (test_guard.GuardTests.test_memory_database_rejected) ... ok
+test_parallel_processes_only_dispatch_once (test_guard.GuardTests.test_parallel_processes_only_dispatch_once) ... ok
+test_process_death_before_and_after_external_commit (test_guard.GuardTests.test_process_death_before_and_after_external_commit) ... ok
+test_replayed_result_mutation_does_not_change_journal (test_guard.GuardTests.test_replayed_result_mutation_does_not_change_journal) ... ok
+test_result_encoding_failure_keeps_unknown (test_guard.GuardTests.test_result_encoding_failure_keeps_unknown) ... ok
+test_returned_payload_can_be_independently_verified (test_guard.GuardTests.test_returned_payload_can_be_independently_verified) ... ok
+test_scope_isolation_and_distinct_intents (test_guard.GuardTests.test_scope_isolation_and_distinct_intents) ... ok
+test_strict_json_and_identity_validation (test_guard.GuardTests.test_strict_json_and_identity_validation) ... ok
+test_timeout_after_effect_is_not_retried (test_guard.GuardTests.test_timeout_after_effect_is_not_retried) ... ok
+test_token_depends_on_explicit_identity_not_argument_hash (test_guard.GuardTests.test_token_depends_on_explicit_identity_not_argument_hash) ... ok
+test_tool_error_payload_is_returned_not_claimed_verified (test_guard.GuardTests.test_tool_error_payload_is_returned_not_claimed_verified) ... ok
+test_unknown_can_be_verified_without_dispatch (test_guard.GuardTests.test_unknown_can_be_verified_without_dispatch) ... ok
+test_unrelated_database_is_not_adopted (test_guard.GuardTests.test_unrelated_database_is_not_adopted) ... ok
+test_unserializable_verification_result_keeps_unknown (test_guard.GuardTests.test_unserializable_verification_result_keeps_unknown) ... ok
+test_verification_requires_existing_reservation (test_guard.GuardTests.test_verification_requires_existing_reservation) ... ok
+test_inconclusive_lookup_does_not_enable_retry (test_live_mcp.LiveAdapterTests.test_inconclusive_lookup_does_not_enable_retry) ... ok
+test_lost_response_is_recovered_through_adapter (test_live_mcp.LiveAdapterTests.test_lost_response_is_recovered_through_adapter) ... ok
+test_model_cannot_change_parameters_to_bypass_guard (test_live_mcp.LiveAdapterTests.test_model_cannot_change_parameters_to_bypass_guard) ... ok
+test_model_cannot_invent_new_operation_slot (test_live_mcp.LiveAdapterTests.test_model_cannot_invent_new_operation_slot) ... ok
+test_new_adapter_process_state_replays_existing_operation (test_live_mcp.LiveAdapterTests.test_new_adapter_process_state_replays_existing_operation) ... ok
+test_stdio_protocol_initialization_and_tool_call (test_live_mcp.LiveAdapterTests.test_stdio_protocol_initialization_and_tool_call) ... ok
+
+----------------------------------------------------------------------
+Ran 39 tests in 1.630s
+
+OK
