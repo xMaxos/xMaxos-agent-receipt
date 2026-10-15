@@ -25,8 +25,12 @@ were checked and all 56 tests passed against the installed artifact. Results in
 
 The live-model results below belong to 0.1.0; the async extension has not been tested
 with a live model or hosted effect API. No new model quota was used for this update.
-The historical CI result below covers 0.1.0; current CI results are recorded separately
-in `evidence/ci-0.2.0.json` once the public run completes.
+GitHub Actions passed all four Windows/Linux and Python 3.11/3.12 jobs for code commit
+`350c33031b5c0b7db13818da39b0c7b20b14b010`. Each job ran the 56-test source suite,
+fault lab, both quickstarts, wheel build and 56 installed-wheel tests. See
+[the public run](https://github.com/xMaxos/xMaxos-agent-receipt/actions/runs/38733634620)
+and `evidence/ci-0.2.0.json`. The evidence-only follow-up does not change tested code.
+The historical CI result below covers 0.1.0.
 
 ## Version 0.1.0: historical validation
 

@@ -1,0 +1,16 @@
+{
+  "repository": "xMaxos/xMaxos-agent-receipt",
+  "version": "0.2.0",
+  "tested_commit": "350c33031b5c0b7db13818da39b0c7b20b14b010",
+  "workflow_run_id": 38733634620,
+  "url": "https://github.com/xMaxos/xMaxos-agent-receipt/actions/runs/38733634620",
+  "conclusion": "success",
+  "jobs": [
+    {"id": 116417303772, "name": "test (ubuntu-latest, 3.12)", "conclusion": "success"},
+    {"id": 116417304001, "name": "test (ubuntu-latest, 3.11)", "conclusion": "success"},
+    {"id": 116417304087, "name": "test (windows-latest, 3.12)", "conclusion": "success"},
+    {"id": 116417304169, "name": "test (windows-latest, 3.11)", "conclusion": "success"}
+  ],
+  "checks_per_job": ["56 behavioral tests", "offline fault demo", "sync quickstart", "async cancellation quickstart", "wheel build", "56 installed-wheel tests"],
+  "live_model_calls_in_ci": false
+}
