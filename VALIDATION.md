@@ -1,6 +1,34 @@
 # Validation record
 
-Date: 2026-10-15. Initial local release, version 0.1.0.
+Date: 2026-10-15. Current version: 0.2.0.
+
+## Version 0.2.0: async extension
+
+The source suite passed 56 tests on Windows / CPython 3.12.14 / SQLite 3.53.1:
+the existing 39 plus 17 new async tests. New coverage includes mixed sync/async
+contention, real task cancellation before/after an effect, outer `asyncio.timeout`,
+cancellation while reservation/result workers continue, a held SQLite write lock
+without event-loop blocking, context preservation, late verification races and
+invalid inputs/results. The journal schema remains version 1.
+
+The first sandboxed attempt stalled before the first test entered its coroutine:
+Windows asyncio's local socket-pair setup was blocked. A minimal standard-library
+reproducer confirmed this environment issue. The same suite passed outside that
+restriction without external service calls.
+
+The async example cancels a task after a committed record in a separate local SQLite
+backend, restarts the guard, blocks redispatch and verifies exactly one record.
+The 120-execution fault lab was rerun for this version with unchanged effect counts.
+The built 0.2.0 wheel was installed offline into a fresh temporary directory; imports
+were checked and all 56 tests passed against the installed artifact. Results in
+`evidence/wheel-check.json` and `evidence/wheel-tests.txt` identify the new artifact.
+
+The live-model results below belong to 0.1.0; the async extension has not been tested
+with a live model or hosted effect API. No new model quota was used for this update.
+The historical CI result below covers 0.1.0; current CI results are recorded separately
+in `evidence/ci-0.2.0.json` once the public run completes.
+
+## Version 0.1.0: historical validation
 
 ## Environment actually exercised
 
@@ -73,8 +101,10 @@ Ran `python scripts/verify_wheel.py`: installed the wheel offline into a fresh t
 directory, asserted imports came from that installed directory, and passed all 39
 behavioral tests against it (including child processes).
 
-Artifact size and SHA-256 are recorded in `evidence/wheel-check.json`; test output is
-in `evidence/wheel-tests.txt`. This confirms the built wheel, not just the source files.
+Historical artifact metadata and output are available in
+[the 0.1.0 commit](https://github.com/xMaxos/xMaxos-agent-receipt/tree/5266649a4bcc28b5771ffead59a1e927c1b01b55/evidence).
+The current `wheel-check.json` and `wheel-tests.txt` files describe 0.2.0 instead.
+These checks exercise the built wheel, not just the source files.
 
 ## Live agent checks
 

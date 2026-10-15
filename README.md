@@ -20,13 +20,14 @@ From this source directory:
 python -m unittest discover -s tests -v
 python examples/crash_lab.py --trials 10 --output evidence
 python examples/quickstart.py
+python examples/async_quickstart.py
 ```
 
 Install locally with `python -m pip install .`, or build and install a wheel:
 
 ```sh
 python -m pip wheel . --no-deps --wheel-dir dist
-python -m pip install dist/agent_receipt-0.1.0-py3-none-any.whl
+python -m pip install dist/agent_receipt-0.2.0-py3-none-any.whl
 ```
 
 The distribution name is provisional; this release has not been published to PyPI.
@@ -80,6 +81,43 @@ external observation is true, read-only, sufficiently consistent or complete. An
 LLM saying "done" is not evidence. Include tenant, destination and all meaningful
 inputs in the request identity; do not switch endpoints behind the same adapter.
 
+## Async tools
+
+Version 0.2.0 adds native asyncio callbacks. SQLite work runs in worker threads;
+your async adapter runs on the caller's event loop and keeps its context.
+
+```python
+import asyncio
+
+# Inside your async application's startup:
+guard = await asyncio.to_thread(Guard, "agent-receipts.sqlite")
+
+async def invoke(req):
+    return await inventory.create(**req.arguments, client_reference=req.token)
+
+receipt = await guard.aexecute(request, invoke)
+# A verifier declared with async def can be passed to guard.areconcile().
+stored = await guard.aget(request)
+```
+
+`aexecute` and `areconcile` accept `async def` functions (including partials) or
+objects with `async def __call__`. Wrap a synchronous factory returning an awaitable
+in an `async def` adapter. Callbacks must still return strict JSON / `Observation`,
+respectively. The sync and async APIs share the same journal and operation identities.
+
+`CancelledError` propagates; ordinary callback exceptions produce an uncertain
+receipt. Cancellation **never releases a reservation**. Cancellation during a
+database await does not stop the worker: its reservation or result may still commit.
+Cancellation during a remote request does not prove the effect stopped. An outer
+`asyncio.timeout()` therefore must not trigger a fresh operation key or blind retry.
+
+The constructor is synchronous: create it before starting the event loop or use
+`asyncio.to_thread` as above. For an existing synchronous adapter, use
+`await asyncio.to_thread(guard.execute, request, sync_adapter)`.
+
+Run [the async demo](examples/async_quickstart.py) to cancel a task after a real local
+write, restart the guard, block replay and verify the effect. No API key is needed.
+
 ## What the states mean
 
 | State | Meaning | Host behavior |
@@ -88,7 +126,7 @@ inputs in the request identity; do not switch endpoints behind the same adapter.
 | `returned` | A JSON response was durably recorded | Inspect the response, including any tool error. This does not assert business success. |
 | `verified` | A trusted verifier observed the complete intended effect | Inspect the recorded result and evidence reference. |
 
-`execute` invokes the callback at most once for each `(scope, key)` in one intact
+`execute` / `aexecute` invoke the callback at most once for each `(scope, key)` in one intact
 journal. A successful repeated call returns the cached receipt with `replayed=True`.
 Reusing a key with different arguments or a different tool raises `RequestConflict`.
 JSON object ordering is ignored; values, types and array order are not.
@@ -108,9 +146,8 @@ terminal cancellation; this version does not implement those mechanisms.
   A scope is a namespace, not an authentication mechanism.
 - All workers protecting the same operations must share this same local database.
   Separate copies, restored old backups and lost journals remove that protection.
-- The callback must be synchronous and return strict JSON values. In an async host,
-  use `await asyncio.to_thread(guard.execute, request, sync_adapter)`; cancellation
-  of that await does not terminate the worker or prove the remote action stopped.
+- Use `execute` for synchronous callbacks and `aexecute` for asyncio callbacks.
+  Both require strict JSON results. Cancellation does not prove an action stopped.
 - SDK/HTTP retries **inside** the callback are outside the guard. Disable unsafe
   internal retries or use the provider's idempotency contract.
 - Errors during invocation or result serialization produce `unknown`. Exceptions'
@@ -142,12 +179,14 @@ See [VALIDATION.md](VALIDATION.md) for the exact tested environment and scope.
 
 ## Live AI-agent integration test
 
-Seven live Codex agent runs (including one pilot) used the configured `gpt-6-astra`
+Seven live Codex agent runs on version 0.1.0 (including one pilot) used the configured `gpt-6-astra`
 model and a real stdio MCP connection. All passed the effect/state checks. The agent
 recovered an already-committed write, respected a durable reservation after restart,
 left an unconfirmed action explicitly unresolved, and created two distinct intended
 actions with identical parameters. Final statements were also reviewed against the
 tool evidence. The model selected its own tool sequence; it was not a scripted policy.
+The new async API has separate offline cancellation/concurrency coverage; these
+historical live runs do not exercise it.
 
 The comparison agent without the guard also handled its timeout safely by inspecting
 the effect. This small sample demonstrates integration, **not superiority** over an
@@ -197,3 +236,6 @@ Useful next contributions: real adapter examples with authoritative operation lo
 independent reproduction, and failure cases that violate the documented guarantee.
 Reproduce a failure with a deterministic test before expanding the API. No claim is
 made that this project is novel or better than existing libraries.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for focused starter tasks and the required
+checks, and [CHANGELOG.md](CHANGELOG.md) for version changes.

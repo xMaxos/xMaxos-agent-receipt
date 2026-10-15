@@ -1,4 +1,4 @@
-include LICENSE AGENTS.md VALIDATION.md
+include LICENSE AGENTS.md VALIDATION.md CONTRIBUTING.md CHANGELOG.md
 recursive-include tests *.py
 recursive-include examples *.py
 recursive-include scripts *.py

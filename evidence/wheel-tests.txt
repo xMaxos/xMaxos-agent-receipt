@@ -1,3 +1,20 @@
+test_async_callable_and_partial_supported (test_async_guard.AsyncGuardTests.test_async_callable_and_partial_supported) ... ok
+test_bad_callback_rejected_before_reservation (test_async_guard.AsyncGuardTests.test_bad_callback_rejected_before_reservation) ... ok
+test_callback_uses_callers_loop_and_context (test_async_guard.AsyncGuardTests.test_callback_uses_callers_loop_and_context) ... ok
+test_cancellation_before_and_after_effect_preserves_unknown (test_async_guard.AsyncGuardTests.test_cancellation_before_and_after_effect_preserves_unknown) ... ok
+test_cancelled_reservation_worker_can_still_commit_without_dispatch (test_async_guard.AsyncGuardTests.test_cancelled_reservation_worker_can_still_commit_without_dispatch) ... ok
+test_cancelled_result_worker_may_finish_but_never_redispatches (test_async_guard.AsyncGuardTests.test_cancelled_result_worker_may_finish_but_never_redispatches) ... ok
+test_cancelled_verifier_does_not_change_receipt (test_async_guard.AsyncGuardTests.test_cancelled_verifier_does_not_change_receipt) ... ok
+test_database_failure_prevents_async_dispatch (test_async_guard.AsyncGuardTests.test_database_failure_prevents_async_dispatch) ... ok
+test_empty_lookup_reloads_late_completion_and_never_releases (test_async_guard.AsyncGuardTests.test_empty_lookup_reloads_late_completion_and_never_releases) ... ok
+test_invalid_result_and_verifier_keep_reservation (test_async_guard.AsyncGuardTests.test_invalid_result_and_verifier_keep_reservation) ... ok
+test_missing_reservation_and_input_conflicts (test_async_guard.AsyncGuardTests.test_missing_reservation_and_input_conflicts) ... ok
+test_outer_timeout_does_not_authorize_retry (test_async_guard.AsyncGuardTests.test_outer_timeout_does_not_authorize_retry) ... ok
+test_parallel_sync_and_async_callers_dispatch_once (test_async_guard.AsyncGuardTests.test_parallel_sync_and_async_callers_dispatch_once) ... ok
+test_replay_across_sync_async_and_restart (test_async_guard.AsyncGuardTests.test_replay_across_sync_async_and_restart) ... ok
+test_sqlite_lock_does_not_block_event_loop (test_async_guard.AsyncGuardTests.test_sqlite_lock_does_not_block_event_loop) ... ok
+test_timeout_after_effect_and_authoritative_verification (test_async_guard.AsyncGuardTests.test_timeout_after_effect_and_authoritative_verification) ... ok
+test_verification_wins_over_late_async_return (test_async_guard.AsyncGuardTests.test_verification_wins_over_late_async_return) ... ok
 test_arguments_not_persisted_in_journal (test_guard.GuardTests.test_arguments_not_persisted_in_journal) ... ok
 test_async_callback_rejected_before_reservation (test_guard.GuardTests.test_async_callback_rejected_before_reservation) ... ok
 test_bad_callback_does_not_consume_operation (test_guard.GuardTests.test_bad_callback_does_not_consume_operation) ... ok
@@ -39,6 +56,6 @@ test_new_adapter_process_state_replays_existing_operation (test_live_mcp.LiveAda
 test_stdio_protocol_initialization_and_tool_call (test_live_mcp.LiveAdapterTests.test_stdio_protocol_initialization_and_tool_call) ... ok
 
 ----------------------------------------------------------------------
-Ran 39 tests in 1.630s
+Ran 56 tests in 2.100s
 
 OK

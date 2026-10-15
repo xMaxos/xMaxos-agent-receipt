@@ -8,14 +8,16 @@ import re
 import subprocess
 import sys
 import tempfile
+import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def main():
-    wheels = list((ROOT / "dist").glob("*.whl"))
+    version = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
+    wheels = list((ROOT / "dist").glob(f"agent_receipt-{version}-*.whl"))
     if len(wheels) != 1:
-        raise RuntimeError("Expected one built wheel in dist/")
+        raise RuntimeError(f"Expected one wheel for version {version} in dist/")
     wheel = wheels[0]
     with tempfile.TemporaryDirectory(prefix="agent-receipt-wheel-") as temporary:
         target = Path(temporary) / "installed"

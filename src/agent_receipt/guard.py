@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import inspect
 import json
@@ -10,7 +11,7 @@ import sqlite3
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Iterator, Literal
+from typing import Any, Callable, Coroutine, Iterator, Literal
 
 
 def _json(value: Any) -> str:
@@ -124,7 +125,7 @@ class RequestConflict(ValueError):
 
 
 class Guard:
-    """Synchronous, process-safe guard sharing one local filesystem database.
+    """Process-safe sync/async guard sharing one local filesystem database.
 
     Reservations never expire. A lost process may leave an unknown receipt forever.
     This sacrifices automatic progress to prevent a second local dispatch.
@@ -187,9 +188,25 @@ class Guard:
         )
 
     def get(self, request: Request) -> Receipt | None:
+        return self._get(request, replayed=True)
+
+    def _get(self, request: Request, *, replayed: bool) -> Receipt | None:
         with self._transaction() as db:
             row = self._read(db, request)
-            return None if row is None else self._receipt(row, replayed=True)
+            return None if row is None else self._receipt(row, replayed=replayed)
+
+    def _reserve(self, request: Request) -> Receipt | None:
+        with self._transaction() as db:
+            row = self._read(db, request)
+            if row is not None:
+                return self._receipt(row, replayed=True)
+            db.execute("INSERT INTO receipts VALUES (?,?,?,?, 'unknown',NULL,NULL)",
+                       (request.scope, request.key, request.tool, request.fingerprint))
+        return None  # The reservation is durable before any callback can run.
+
+    @staticmethod
+    def _is_async(call: Any) -> bool:
+        return inspect.iscoroutinefunction(call) or inspect.iscoroutinefunction(getattr(call, "__call__", None))
 
     def execute(self, request: Request, call: Callable[[Request], Any]) -> Receipt:
         """Reserve durably before dispatch. Never retry an existing reservation.
@@ -198,21 +215,59 @@ class Guard:
         Callback/serialization errors yield 'unknown'; process-control exceptions
         propagate, with the reservation already durable. Error text is not persisted.
         """
-        if not callable(call) or inspect.iscoroutinefunction(call) or inspect.iscoroutinefunction(getattr(call, "__call__", None)):
-            raise TypeError("call must be synchronous; run the whole guarded call in a worker thread if needed")
-        with self._transaction() as db:
-            row = self._read(db, request)
-            if row is not None:
-                return self._receipt(row, replayed=True)
-            db.execute("INSERT INTO receipts VALUES (?,?,?,?, 'unknown',NULL,NULL)",
-                       (request.scope, request.key, request.tool, request.fingerprint))
+        if not callable(call) or self._is_async(call):
+            raise TypeError("call must be synchronous; use aexecute for async callbacks")
+        existing = self._reserve(request)
+        if existing is not None:
+            return existing
         # No DB lock is held during tool execution. The reservation is committed.
         try:
             result_json = _json(call(request))
         except Exception:
-            with self._transaction() as db:
-                return self._receipt(self._read(db, request), replayed=False)
+            return self._get(request, replayed=False)
         return self._finish(request, result_json, state="returned", evidence=None)
+
+    async def aget(self, request: Request) -> Receipt | None:
+        """Read a receipt without blocking the event loop on SQLite."""
+        return await asyncio.to_thread(self.get, request)
+
+    async def aexecute(self, request: Request,
+                       call: Callable[[Request], Coroutine[Any, Any, Any]]) -> Receipt:
+        """Reserve off-loop, then await an async callback on the caller's event loop.
+
+        Cancellation propagates and never releases a reservation. A cancelled
+        SQLite worker can still commit: cancellation is not permission to retry.
+        Ordinary callback errors yield an unknown (or concurrently verified) receipt.
+        """
+        if not callable(call) or not self._is_async(call):
+            raise TypeError("call must be an async function or async callable object")
+        existing = await asyncio.to_thread(self._reserve, request)
+        if existing is not None:
+            return existing
+        try:
+            result_json = _json(await call(request))
+        except Exception:
+            return await asyncio.to_thread(self._get, request, replayed=False)
+        return await asyncio.to_thread(self._finish, request, result_json,
+                                       state="returned", evidence=None)
+
+    async def areconcile(self, request: Request,
+                         verify: Callable[[Request], Coroutine[Any, Any, Observation]]) -> Receipt:
+        """Await a trusted read-only verifier; never dispatch or release a reservation."""
+        if not callable(verify) or not self._is_async(verify):
+            raise TypeError("verify must be an async function or async callable object")
+        current = await self.aget(request)
+        if current is None:
+            raise KeyError("No dispatch reservation exists for this operation")
+        if current.state == "verified":
+            return current
+        observation = await verify(request)
+        if not isinstance(observation, Observation):
+            raise TypeError("verify must return Observation")
+        if not observation.applied:
+            return await self.aget(request)
+        return await asyncio.to_thread(self._finish, request, _json(observation.result),
+                                       state="verified", evidence=observation.evidence)
 
     def reconcile(self, request: Request, verify: Callable[[Request], Observation]) -> Receipt:
         """Read-only verification; never dispatches or releases a reservation.

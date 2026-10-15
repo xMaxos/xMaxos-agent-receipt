@@ -1,37 +1,43 @@
-# A timeout is not proof that an agent's write failed
+# Draft for the r/AI_Agents weekly Project Display thread
 
-Agent Receipt is a small, dependency-free Python library for agent hosts that need
-to avoid blindly repeating side-effecting tool calls.
+Not posted. Review and adapt before use; check the current thread and account's
+self-promotion eligibility. This draft is not for HN, DEV or r/mcp.
 
-It commits a SQLite dispatch reservation before calling a tool. Repeated operation
-IDs return a recorded response or an explicit `unknown` outcome. A trusted read-only
-verifier can resolve uncertainty using an operation-specific backend lookup.
+---
 
-The deliberately conservative bit: reservations never expire, and an empty lookup
-does not make a retry safe. The original write may still arrive later.
+**Agent Receipt: what should an agent host do when a write times out?**
 
-The repo includes a reproducible local fault lab: lost responses, real subprocess
-crashes before/after a commit, delayed writes, and legitimate identical new actions.
-Across 120 runs, the naive retry baseline produced 30 extra effects; the guard
-produced none. The guard also left 10 crash-before-commit actions incomplete and
-explicitly unknown. That tradeoff is included in the published raw results.
+I'm sharing a small MIT-licensed Python library developed with AI assistance.
+The problem it addresses: a tool may commit a change and then lose its response.
+Repeating the call can repeat the change.
 
-Seven real Codex agent runs, including a pilot, also passed with a local MCP adapter.
-The model recovered committed writes, left unresolved outcomes unconfirmed, and
-respected the distinction between replay and two intentional identical actions.
-The unguarded comparison agent also handled its timeout correctly; this small sample
-does not demonstrate superiority. Hosted side-effect APIs remain untested.
+Agent Receipt persists a SQLite reservation before dispatch. The same host-assigned
+operation key returns a receipt instead of calling the tool again. An uncertain
+outcome stays `unknown` until a trusted adapter verifies the complete effect.
 
-This is not a new algorithm or an exactly-once guarantee. It is a focused
-implementation and regression lab that others can inspect, reproduce and build on.
+The tradeoff matters: a crash before dispatch can leave an action unfinished forever.
+An empty lookup does not unlock retries. This is local dispatch protection, not a
+remote exactly-once guarantee.
 
-I would particularly welcome adapter examples with authoritative outcome lookup,
-independent reproductions, and counterexamples to the documented guarantees.
+The new 0.2.0 API supports async callbacks and preserves reservations when tasks are
+cancelled. There are no runtime dependencies. Try the offline cancellation demo:
 
-Python 3.11+. MIT license. No model API or account required for the offline experiments.
-The live integration test is opt-in and uses the tester's own model/account quota.
+```sh
+git clone https://github.com/xMaxos/xMaxos-agent-receipt.git
+cd xMaxos-agent-receipt
+python examples/async_quickstart.py
+```
+
+Expected result: `unknown` after cancellation, `verified` after lookup, one actual
+record. The suite has 56 tests. Seven earlier live Codex/MCP runs covered the sync
+adapter; they do not test the new async API. The unguarded comparison agent also
+handled its timeout correctly, so those runs are integration evidence, not proof
+that the guard outperforms an agent.
+
+I'd welcome an independent reproduction or an example adapter with authoritative
+operation lookup. What would make this useful in your tool dispatcher?
 
 Repository: https://github.com/xMaxos/xMaxos-agent-receipt
 
-Publication note: this post is a draft; it has not been sent to social media.
-Do not describe this initial local release as independently reviewed or production-proven.
+Disclosure: the project and this draft used AI assistance. Hosted side-effect APIs
+and production conditions remain untested.

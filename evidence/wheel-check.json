@@ -1,8 +1,8 @@
 {
-  "artifact": "agent_receipt-0.1.0-py3-none-any.whl",
-  "sha256": "912095f12095504521a92e42e9e862d518b09adfbe74b774d4716b5a371976cb",
-  "bytes": 10970,
+  "artifact": "agent_receipt-0.2.0-py3-none-any.whl",
+  "sha256": "741dbb692750df64d2ba7e6a5af8c8fe1bd55c22ee58634dfb5eb94c679fa284",
+  "bytes": 12074,
   "installed_artifact_import_verified": true,
-  "tests_passed": 39,
+  "tests_passed": 56,
   "network_used": false
 }
