@@ -1,18 +1,55 @@
+![Agent Receipt — A timeout isn't a failed write. Python, SQLite, async and MIT.](docs/assets/agent-receipt-social.jpg)
+
 # Agent Receipt
 
-**A small durable guard for side-effecting AI-agent tool calls.**
+**Keep a lost tool response from becoming a duplicate write.**
+
+[![Tests](https://github.com/xMaxos/xMaxos-agent-receipt/actions/workflows/tests.yml/badge.svg)](https://github.com/xMaxos/xMaxos-agent-receipt/actions/workflows/tests.yml)
+
+**Python 3.11+ · Sync + async · SQLite · No runtime dependencies · MIT**
+
+[Try the demo](#try-it) · [Understand the states](#what-the-states-mean)
+· [Inspect the evidence](VALIDATION.md) · [Contribute](CONTRIBUTING.md)
 
 If a tool commits a change and its response disappears, retrying can repeat the change.
 Agent Receipt records a dispatch reservation **before** invoking the tool. Further calls
 with the same operation identity return the recorded response or an explicit `unknown`
 outcome. A trusted, read-only verifier can resolve the uncertainty.
 
-Python 3.11+, SQLite, no runtime dependencies or telemetry. The library itself makes
-no model requests. MIT licensed.
-This is an initial reference implementation, not a new distributed-systems algorithm.
-It is a library for agent hosts and tool developers, not a chatbot or personal assistant.
+For agent hosts and tool developers. No model requests or telemetry are made by the
+library. This is an early reference implementation with a conservative local
+dispatch policy; it does not guarantee exactly-once remote effects.
+
+**Looking for testers and contributors:** run the demo, report a reproducible failure,
+or help build a real adapter with authoritative outcome lookup.
+[Find a focused starting task →](CONTRIBUTING.md)
 
 ## Try it
+
+Clone and run a complete local example. No API key or model account is needed:
+
+```sh
+git clone https://github.com/xMaxos/xMaxos-agent-receipt.git
+cd xMaxos-agent-receipt
+python examples/async_quickstart.py
+```
+
+The demo cancels a tool after a real local write, restarts the guard, blocks another
+dispatch and verifies the existing record:
+
+```json
+{
+  "after_cancellation": "unknown",
+  "after_verification": "verified",
+  "actual_external_effects": 1
+}
+```
+
+**The tradeoff:** a crash before dispatch can leave work unfinished and blocked.
+An empty lookup does not make a retry safe; the original write could still arrive.
+
+<details>
+<summary>Development checks and installation</summary>
 
 From this source directory:
 
@@ -31,6 +68,8 @@ python -m pip install dist/agent_receipt-0.2.0-py3-none-any.whl
 ```
 
 The distribution name is provisional; this release has not been published to PyPI.
+
+</details>
 
 ## Integration
 
@@ -119,6 +158,8 @@ Run [the async demo](examples/async_quickstart.py) to cancel a task after a real
 write, restart the guard, block replay and verify the effect. No API key is needed.
 
 ## What the states mean
+
+![Receipt states: unknown is a durable reservation; a recorded response becomes returned; only trusted observation of the complete effect becomes verified. No state releases the reservation.](docs/assets/receipt-states.svg)
 
 | State | Meaning | Host behavior |
 |---|---|---|

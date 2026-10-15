@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="440" viewBox="0 0 1200 440" role="img" aria-labelledby="title desc">
+  <title id="title">Three receipt states, one durable reservation</title>
+  <desc id="desc">Unknown means an operation is reserved. A recorded tool response produces returned. Trusted positive verification produces verified, either from unknown or returned. No state authorizes redispatch.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="none" stroke="#17242d" stroke-width="1.5"/></marker>
+  </defs>
+  <rect width="1200" height="440" rx="16" fill="#f3f0e9"/>
+  <g font-family="Arial, Helvetica, sans-serif" fill="#17242d">
+    <text x="48" y="60" font-size="27" font-weight="700">Three states. One durable reservation.</text>
+    <rect x="48" y="136" width="278" height="116" rx="8" fill="#f7e2d3" stroke="#d96742" stroke-width="2"/>
+    <rect x="461" y="136" width="278" height="116" rx="8" fill="#ffffff" stroke="#17242d" stroke-width="2"/>
+    <rect x="874" y="136" width="278" height="116" rx="8" fill="#e1ebe4" stroke="#527a67" stroke-width="2"/>
+    <text x="187" y="188" text-anchor="middle" font-size="37" font-weight="700">unknown</text>
+    <text x="187" y="224" text-anchor="middle" font-size="22">Outcome uncertain</text>
+    <text x="600" y="188" text-anchor="middle" font-size="37" font-weight="700">returned</text>
+    <text x="600" y="224" text-anchor="middle" font-size="22">Response recorded</text>
+    <text x="1013" y="188" text-anchor="middle" font-size="37" font-weight="700">verified</text>
+    <text x="1013" y="224" text-anchor="middle" font-size="22">Effect observed</text>
+    <path d="M334 194H448" fill="none" stroke="#17242d" stroke-width="2" marker-end="url(#arrow)"/>
+    <path d="M747 194H861" fill="none" stroke="#17242d" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="393" y="120" text-anchor="middle" font-size="19">JSON return</text>
+    <text x="806" y="120" text-anchor="middle" font-size="19">Trusted verification</text>
+    <path d="M187 260V306H1013V264" fill="none" stroke="#527a67" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="600" y="343" text-anchor="middle" font-size="23">Trusted verification can also resolve an unknown outcome directly.</text>
+    <path d="M48 372H1152" stroke="#17242d" stroke-opacity=".18"/>
+    <text x="48" y="410" font-size="23" font-weight="700">No automatic retry. No expiry. Returned does not mean verified.</text>
+  </g>
+</svg>
