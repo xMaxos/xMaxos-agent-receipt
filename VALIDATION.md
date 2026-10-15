@@ -10,8 +10,9 @@ Date: 2026-10-15. Initial local release, version 0.1.0.
 - Offline suite: no model API calls, credentials or external services
 - Separate opt-in live suite: authenticated Codex CLI, requested model `gpt-6-astra`
 
-Python 3.11+ is the declared package compatibility range. Other Python versions
-and operating systems have not been executed in this validation.
+Python 3.11+ is the declared package compatibility range. GitHub Actions additionally
+passed on Linux and Windows with Python 3.11 and 3.12. Other versions and operating
+systems remain untested. See `evidence/ci-results.json` for the exact tested commit.
 
 ## Behavioral checks
 
@@ -96,8 +97,10 @@ The live runs used an approved network-enabled launcher while the nested agent k
 its read-only shell sandbox and disabled shell tools. Only the two local ticket MCP
 tools were requested by the test. Raw runtime logs are excluded from publication.
 
-The repository includes an offline CI matrix for Linux/Windows and Python 3.11/3.12;
-its run status is available on GitHub. Live model tests are never started by CI.
+The offline CI matrix passed all four Linux/Windows and Python 3.11/3.12 jobs for
+code commit `8dc25c8b9d996a8a2802b13e5805acfc6fa00aec`. Each job ran the 39-test suite,
+the fault demo, quickstart, wheel build, and installed-wheel checks. Evidence-only
+documentation updates do not change that tested code. Live model tests never run in CI.
 
 The GitHub source repository is `https://github.com/xMaxos/xMaxos-agent-receipt`.
 No PyPI publication or social-media post is part of this release.
